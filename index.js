@@ -15,12 +15,25 @@ const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-console.log(uri)
-client.connect(err => {
-  const collection = client.db('test').collection('devices')
-  // perform actions on the collection object
-  client.close()
-})
+
+async function run () {
+  try {
+    await client.connect()
+    const database = client.db('medicare')
+    const appointmentsCollection = database.collection('appointments')
+
+    // Post Appointment
+    app.post('/appoints', async (req, res) => {
+      const appointment = req.body
+      console.log(appointment)
+      const result = await appointmentsCollection.insertOne(appointment)
+      res.json(result)
+    })
+  } finally {
+    // await client.close();
+  }
+}
+run().catch(console.dir)
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
